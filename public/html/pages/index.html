@@ -10,14 +10,140 @@ and open the template in the editor.
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <script src="../../js/libraries/jquery.min.js" type="text/javascript"></script>
-        <script src="../../js/libraries/vue.min.js" type="text/javascript"></script>
+        <script src="../../js/libraries/vue.js" type="text/javascript"></script>
         <link href="../../css/bootstrap.min.css" rel="stylesheet" type="text/css"/>
         <script src="https://cdn.jsdelivr.net/vue.resource/1.2.1/vue-resource.min.js"></script>
     </head>
     <body>
         <div id="app">
-            <input type="text" class="form-control" v-model="message"/>
-        </div>
+            <div class="well">
+                <div class="row">
+                    <div v-if="viewtype === 'index'">
+                        <h1>Welcome to Kwetter!</h1>
+                        <div class="col col-md-6"> <a href="moderator/index.html">Moderators click here</a></div>
+                    </div>
+                    <div v-if="viewtype === 'user'">
+                        <div class="col col-md-6"><p>Search your posts</p><input v-on:keyup="searchPosts" style="width:150px;" type="text" class="form-control" v-model="searchTerm" ></input></div>
+                        <div class="col col-md-6"><button style="float:right; botton =20px;" class='btn btn-primary' v-on:click=''>Logout</button> </div>
+                    </div>
+                </div>
+
+            </div>
+            <div class="container" style="padding-right: 10%; padding-left: 10%;width:1920px!important;">
+
+
+
+                <!--Index template-->
+                <div  v-if="viewtype === 'index'" class="row">
+                    <div class="col-md-12">
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                <h3 class="panel-title">Active users</h3>
+                            </div>
+                            <div class="panel-body">
+                                <table id="table_div" class="table table-striped">
+                                    <tbody>
+                                    <th>Name</th>
+                                    <tr v-for="user in users" v-on:click="displayUser(user)">
+                                        <td>
+                                            {{user.userName}}
+                                        </td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>   
+                    </div>  
+                </div>  
+
+                <!--User template-->
+                <div  v-if="viewtype === 'user'">
+                    <div  class="row">
+                        <div class="col-md-6">
+                            <div class="panel panel-default">
+                                <div class="panel-heading">
+                                    <h3 class="panel-title">Profile</h3>
+                                </div>
+                                <div class="panel-body">
+                                    <div class="col-md-6">
+                                        <img width="100px" height='100px;' class='thumbnail' v-bind:src='imageURL'></img>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <h1>{{activeUser.userName}}</h1>
+                                    </div>
+                                </div>
+                            </div>   
+                        </div>  
+                        <div class="col-md-6">
+                            <div class="panel panel-default">
+                                <div class="panel-heading">
+                                    <h3 class="panel-title">Profile Data</h3>
+                                </div>
+                                <div class="panel-body">
+                                    <table id="table_div" class="table table-striped">
+                                        <tbody>
+                                            <tr>
+                                                <td><label>Username:</label></td>
+                                                <td>{{activeUser.userName}}</td>
+                                            </tr>
+                                            <tr>
+                                                <td><label>Location:</label></td>
+                                                <td>{{activeUser.location}}</td>
+                                            </tr>
+                                            <tr>
+                                                <td><label>Website:</label></td>
+                                                <td>{{activeUser.websiteURL}}</td>
+                                            </tr>
+                                            <tr>
+                                                <td><label>Biography:</label></td>
+                                                <td><textarea readonly style="width:100%; height:200px;" type="text" class="form control" name="content" placeholder="What is happening?"/>{{activeUser.biography}}</textarea></td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>   
+                        </div> 
+                    </div> 
+                    <div class='row'>
+                        <div class="col-md-6">
+                            <div class="panel panel-default">
+                                <div class="panel-heading">
+                                    <h3 class="panel-title">Kweets</h3>
+                                </div>
+                                <div class="panel-body">
+                                    <table id="table_div" class="table table-striped">
+                                        <tbody>
+                                        <th>Title</th>
+                                        <th>Content</th>
+                                        <th>Time</th>
+                                        <th>Author</th>
+                                        <tr v-for='post in posts'>
+                                            <td>{{post.title}}</td>
+                                            <td>{{post.content}}</td>
+                                            <td>{{post.date}}</td>
+                                            <td>{{post.author}}</td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>   
+                        </div> 
+                        <div class="col-md-6">
+                            <div class="panel panel-default">
+                                <div class="panel-heading">
+                                    <h3 class="panel-title">Prescence</h3>
+                                </div>
+                                <div class="panel-body">
+                                    <div v-for="user in followers" >
+                                        <img v-on:click="displayUser(user)" v-bind:src="'../images/' + user.profilePicture" class="thumbnail" width="100px" height='100px;'  > </img>
+                                    </div>
+                                </div>
+                            </div>   
+                        </div> 
+                    </div>
+                </div>
+            </div>  
+        </div>  
         <script src="../../js/pages/index_vue.js" type="text/javascript"></script>
     </body>
 </html>
