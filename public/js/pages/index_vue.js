@@ -20,15 +20,57 @@ new Vue({
         postChars: 160,
         newUserName: '',
         newPostTitle: '',
-        newPostContent: ''
+        newPostContent: '',
+        websocket: WebSocket
     },
     mounted: function ()
     {
+        document.addEventListener('beforeunload', this.disconnect);
         this.getUsers();
+        this.connect();
         Vue.http.options.emulateJSON = true;
     },
     methods:
             {
+                disconnect(){
+                    this.sendMessage("Disconnect");
+                },
+                connect() {
+                    var context = this;
+                    context.websocket = new WebSocket('ws://localhost:8080/Kwetter/atpendpoint');
+
+                    context.websocket.onopen = function () {
+                        console.log("Websocket sucessfully initialized");
+                    };
+                    context.websocket.onclose = function () {
+                        console.log("Websocket sucessfully Closed");
+                    };
+                    context.websocket.onmessage = function (evt) {
+                        
+                      var message = JSON.parse(evt.data);
+                        console.log(message);
+                        context.addPost(message);
+                    };
+                    context.websocket.onerror = function (event) {
+                        console.log('red', 'ERROR: ' + event);
+                    };
+                },
+
+                initUserSession() {
+                    var context = this;
+                    let messageObject = {sender: context.activeUser.userName, message: 'InitializeSession'};
+                    let message = JSON.stringify(messageObject);
+                    console.log(message);
+                    context.websocket.send(message);
+                },
+
+                sendMessage(text) {
+                    var context = this;
+                    let message = {sender: context.activeUser.userName, message: text, title: context.newPostTitle};
+                    message = JSON.stringify(message);
+                    console.log(message);
+                    context.websocket.send(message);
+                },
                 clearChars() {
                     this.biographyChars = 160;
                     this.postChars = 160;
@@ -136,7 +178,7 @@ new Vue({
                         if (user.userName !== context.authenticatedUser.userName) {
                             let index = this.users.indexOf(user);
                             context.users.splice(index, 1);
-                        } else{
+                        } else {
                             context.errorMessage = 'You cannot remove yourself';
                         }
 
@@ -186,6 +228,7 @@ new Vue({
 
                         context.j_loginUserName = '';
                         context.j_loginPassword = '';
+                        context.initUserSession();
                     });
                 },
                 sendPost() {
@@ -199,6 +242,11 @@ new Vue({
                         context.clearChars();
                     }))
                         ;
+                },
+                addPost(post) {
+                    var context = this;
+                    this.posts.push(post);
+                    this.searchedPosts.push(post);
                 },
                 searchPosts() {
                     var context = this;
